@@ -1,8 +1,10 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="description" content="Stride Vault — premium sneakers in Ghana">
+<meta name="theme-color" content="#08090a">
 <title>Stride Vault — Premium Sneakers</title>
 <style>
 :root{--bg:#08090a;--card:#111314;--text:#f5f5f2;--muted:#9b9c9e;--line:#26282a;--lime:#d7ff45}
@@ -13,7 +15,9 @@ a{text-decoration:none;color:inherit}.container{width:min(1160px,92%);margin:aut
 header{position:sticky;top:0;z-index:20;background:#08090add;backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
 nav{height:72px;display:flex;align-items:center;justify-content:space-between}.logo{font-weight:950;letter-spacing:.12em}.logo span{color:var(--lime)}
 .links{display:flex;gap:28px;color:#ccc;font-size:.9rem}.links a:hover{color:var(--lime)}
-.navbtn,.btn.primary{background:var(--lime);color:#080808;font-weight:900;border-radius:999px;padding:11px 17px}
+.navbtn{background:var(--lime);color:#080808;font-weight:900;border-radius:999px;padding:11px 17px}
+.cartbtn{background:#17191a;color:white;border:1px solid #303234;border-radius:999px;padding:10px 15px;font-weight:900;cursor:pointer}
+.cartbtn span{color:var(--lime)}
 .hero{min-height:680px;display:flex;align-items:center;position:relative;overflow:hidden}
 .hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.42;filter:saturate(.8)}
 .hero:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#08090af5 0%,#08090abf 52%,#08090a22)}
@@ -21,43 +25,63 @@ nav{height:72px;display:flex;align-items:center;justify-content:space-between}.l
 h1{font-size:clamp(3.5rem,8vw,7.5rem);line-height:.84;letter-spacing:-.07em;margin:18px 0 25px;max-width:800px}
 h1 span{color:var(--lime)}.copy{max-width:540px;color:#c5c6c7;font-size:1.05rem}
 .actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}.btn{display:inline-flex;padding:14px 20px;border-radius:12px;font-weight:900;border:1px solid var(--line)}
-.btn.dark{background:#ffffff0d}.stats{display:flex;gap:30px;margin-top:35px;flex-wrap:wrap}.stats b{font-size:1.2rem}.stats small{display:block;color:#888}
+.primary{background:var(--lime);color:#080808}.dark{background:#ffffff0d}.stats{display:flex;gap:30px;margin-top:35px;flex-wrap:wrap}.stats b{font-size:1.2rem}.stats small{display:block;color:#888}
 section{padding:85px 0}.head{display:flex;justify-content:space-between;align-items:end;margin-bottom:28px;gap:20px}.head h2{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.04em}.head p{color:var(--muted);max-width:380px}
-.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px}.filter{background:none;color:#999;border:1px solid var(--line);padding:9px 14px;border-radius:999px}.filter.active{background:#202224;color:white}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px}.filter{background:none;color:#999;border:1px solid var(--line);padding:9px 14px;border-radius:999px;cursor:pointer}.filter.active{background:#202224;color:white}
 .products{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.card{background:linear-gradient(180deg,#141516,#0e0f10);border:1px solid var(--line);border-radius:20px;overflow:hidden;transition:.2s}.card:hover{transform:translateY(-5px);border-color:#414345}
 .photo{position:relative;background:#eee}.photo img{width:100%;height:310px;display:block;object-fit:cover}.badge{position:absolute;top:12px;left:12px;background:var(--lime);color:#080808;font-size:.7rem;font-weight:950;padding:6px 9px;border-radius:8px}
-.body{padding:17px}.row{display:flex;justify-content:space-between;gap:10px}.body h3{font-size:1.08rem}.price{color:var(--lime);font-weight:950;font-size:1.15rem}.meta{color:#888;font-size:.82rem;margin:5px 0 15px}.order{display:block;text-align:center;background:#fff;color:#080808;padding:12px;border-radius:10px;font-weight:950}.order:hover{background:var(--lime)}
+.body{padding:17px}.row{display:flex;justify-content:space-between;gap:10px}.body h3{font-size:1.08rem}.price{color:var(--lime);font-weight:950;font-size:1.15rem}.meta{color:#888;font-size:.82rem;margin:5px 0 13px}
+select{width:100%;background:#191b1c;color:#fff;border:1px solid #36383a;border-radius:10px;padding:11px;margin-bottom:10px;outline:none}
+.add{width:100%;background:#fff;color:#080808;border:0;padding:12px;border-radius:10px;font-weight:950;cursor:pointer}.add:hover{background:var(--lime)}
 .story{background:#0e0f10;border-block:1px solid var(--line)}.storygrid{display:grid;grid-template-columns:1fr 1fr;gap:50px;align-items:center}.storyimg{width:100%;height:500px;object-fit:cover;border-radius:22px}.story h2{font-size:clamp(2.5rem,5vw,4.5rem);line-height:.92;letter-spacing:-.06em;margin:15px 0 20px}.story p{color:#aaa}
 .points{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:25px}.point{background:#151617;border:1px solid var(--line);padding:15px;border-radius:14px}.point span{display:block;color:#888;font-size:.82rem}
-.cta{text-align:center}.box{border:1px solid #303235;border-radius:24px;padding:55px 20px;background:radial-gradient(circle at 50% 0,#d7ff4520,transparent 45%),#101112}.box h2{font-size:clamp(2.5rem,5vw,4.5rem);line-height:.95}.box p{color:#999;margin:15px auto 25px;max-width:520px}
+.cta{text-align:center}.box{border:1px solid #303235;border-radius:24px;padding:55px 20px;background:radial-gradient(circle at 50% 0,#d7ff4520,transparent 45%),#101112}.box h2{font-size:clamp(2.5rem,5vw,4.5rem);line-height:.95}.box p{color:#999;margin:15px auto 25px}
 footer{border-top:1px solid var(--line);padding:28px 0;color:#777}.foot{display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap}
-@media(max-width:850px){.links{display:none}.navbtn{display:none}.products{grid-template-columns:repeat(2,1fr)}.storygrid{grid-template-columns:1fr}.storyimg{height:380px}}
-@media(max-width:560px){section{padding:65px 0}.products{grid-template-columns:1fr}.photo img{height:330px}.head{display:block}.head p{margin-top:8px}h1{font-size:4rem}.hero{min-height:650px}}
-</style></head>
+.drawer{position:fixed;inset:0;z-index:100;display:none}.drawer.open{display:block}.shade{position:absolute;inset:0;background:#000a;backdrop-filter:blur(4px)}
+.cart{position:absolute;right:0;top:0;height:100%;width:min(440px,92%);background:#101112;border-left:1px solid #333;padding:22px;overflow:auto;box-shadow:-20px 0 60px #0008}
+.carthead{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:15px}.close{background:none;color:white;border:0;font-size:1.5rem;cursor:pointer}
+.cartitems{padding:15px 0}.cartitem{display:grid;grid-template-columns:70px 1fr auto;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}.cartitem img{width:70px;height:70px;object-fit:cover;border-radius:10px}.cartitem small{color:#888;display:block}.remove{background:none;color:#ff7777;border:0;cursor:pointer;font-size:.8rem}
+.total{display:flex;justify-content:space-between;font-size:1.2rem;font-weight:950;padding:18px 0}.checkout{width:100%;background:var(--lime);border:0;border-radius:12px;padding:14px;font-weight:950;cursor:pointer}.empty{color:#888;text-align:center;padding:45px 10px}
+@media(max-width:900px){.links{display:none}.navbtn{display:none}.products{grid-template-columns:repeat(2,1fr)}.storygrid{grid-template-columns:1fr}.storyimg{height:380px}}
+@media(max-width:560px){section{padding:65px 0}.products{grid-template-columns:1fr}.photo img{height:330px}.head{display:block}.head p{margin-top:8px}h1{font-size:4rem}.hero{min-height:650px}.points{grid-template-columns:1fr}}
+</style>
+</head>
 <body>
-<div class="top">GHANA • PREMIUM SNEAKERS • ORDER DIRECTLY ON WHATSAPP</div>
+<div class="top">GHANA • PREMIUM SNEAKERS • SIZES 39–45 • ORDER ON WHATSAPP</div>
 <header><div class="container"><nav>
 <a class="logo" href="#">STRIDE <span>VAULT</span></a>
 <div class="links"><a href="#shop">Shop</a><a href="#story">Our Story</a><a href="#contact">Contact</a></div>
-<a class="navbtn" href="https://wa.me/233206194977?text=Hi%20Stride%20Vault%2C%20I%27d%20like%20to%20shop." target="_blank">WhatsApp</a>
+<button class="cartbtn" onclick="openCart()">Cart <span id="count">0</span></button>
 </nav></div></header>
+
 <section class="hero"><img src="sneaker-1.jpg" alt=""><div class="container content">
 <div class="kicker">Premium sneaker destination</div><h1>MAKE EVERY<br>STEP <span>COUNT.</span></h1>
-<p class="copy">Curated sneakers for people who want their everyday fit to stand out. Browse the collection and order your pair directly through WhatsApp.</p>
+<p class="copy">Curated sneakers for people who want their everyday fit to stand out. Choose your size, add your pair to the cart, then order your selection directly on WhatsApp.</p>
 <div class="actions"><a class="btn primary" href="#shop">Explore Collection</a><a class="btn dark" href="https://wa.me/233206194977?text=Hi%20Stride%20Vault%2C%20I%27m%20looking%20for%20a%20sneaker." target="_blank">Chat With Us ↗</a></div>
-<div class="stats"><div><b>05</b><small>Featured pairs</small></div><div><b>GH₵</b><small>Local pricing</small></div><div><b>24/7</b><small>WhatsApp enquiries</small></div></div>
+<div class="stats"><div><b>05</b><small>Featured pairs</small></div><div><b>39–45</b><small>Available sizes</small></div><div><b>GH₵</b><small>Local pricing</small></div></div>
 </div></section>
+
 <section id="shop"><div class="container">
-<div class="head"><div><div class="kicker">THE VAULT</div><h2>Featured collection</h2></div><p>Pick your pair and tap the order button to start a WhatsApp conversation.</p></div>
+<div class="head"><div><div class="kicker">THE VAULT</div><h2>Featured collection</h2></div><p>Choose your size and add your favourite pairs to your cart.</p></div>
 <div class="filters"><button class="filter active" data-f="all">All</button><button class="filter" data-f="classic">Classics</button><button class="filter" data-f="sport">Sport</button><button class="filter" data-f="jordan">Jordan</button></div>
 <div class="products" id="products"></div></div></section>
+
 <section id="story" class="story"><div class="container storygrid">
 <img class="storyimg" src="sneaker-4.jpg" alt="Air Jordan 4">
 <div><div class="kicker">ABOUT STRIDE VAULT</div><h2>GOOD SHOES.<br>GOOD ENERGY.</h2><p>Stride Vault makes sneaker shopping simple, fast and mobile-friendly. Find a pair that makes you feel confident every time you step out.</p>
-<div class="points"><div class="point"><b>Easy ordering</b><span>One tap to WhatsApp.</span></div><div class="point"><b>Fresh selection</b><span>Standout styles.</span></div><div class="point"><b>Ghana pricing</b><span>Clear GH₵ prices.</span></div><div class="point"><b>Personal service</b><span>Chat before you buy.</span></div></div></div>
+<div class="points"><div class="point"><b>Easy ordering</b><span>Add multiple pairs before checkout.</span></div><div class="point"><b>Sizes 39–45</b><span>Select your preferred size.</span></div><div class="point"><b>Ghana pricing</b><span>Clear GH₵ prices.</span></div><div class="point"><b>WhatsApp checkout</b><span>Send your full cart in one message.</span></div></div></div>
 </div></section>
-<section id="contact" class="cta"><div class="container"><div class="box"><div class="kicker">YOUR NEXT PAIR IS WAITING</div><h2>READY TO<br>LEVEL UP?</h2><p>Message Stride Vault with the sneaker name and your preferred size.</p><a class="btn primary" href="https://wa.me/233206194977?text=Hi%20Stride%20Vault%2C%20I%27d%20like%20to%20place%20an%20order." target="_blank">Order on WhatsApp ↗</a></div></div></section>
+
+<section id="contact" class="cta"><div class="container"><div class="box"><div class="kicker">YOUR NEXT PAIR IS WAITING</div><h2>READY TO<br>LEVEL UP?</h2><p>Add your sneakers to the cart, then send your order to Stride Vault on WhatsApp.</p><button class="btn primary" onclick="openCart()">View Cart & Checkout ↗</button></div></div></section>
+
 <footer><div class="container foot"><div>© <span id="year"></span> Stride Vault</div><div>WhatsApp: 020 619 4977</div></div></footer>
+
+<div class="drawer" id="drawer"><div class="shade" onclick="closeCart()"></div><aside class="cart">
+<div class="carthead"><h2>Your Cart</h2><button class="close" onclick="closeCart()">×</button></div>
+<div class="cartitems" id="cartitems"></div><div class="total"><span>Total</span><span id="total">GH₵0</span></div>
+<button class="checkout" onclick="checkout()">Checkout on WhatsApp</button>
+</aside></div>
+
 <script>
 const products=[
 {name:"RC 1300",price:380,img:"sneaker-1.jpg",cat:"classic",tag:"Featured"},
@@ -65,8 +89,42 @@ const products=[
 {name:"Jordan 9 Retro",price:400,img:"sneaker-3.jpg",cat:"jordan",tag:"Hot"},
 {name:"Air Jordan 4",price:380,img:"sneaker-4.jpg",cat:"jordan",tag:"Featured"},
 {name:"Air Force 1",price:350,img:"sneaker-5.jpg",cat:"classic",tag:"Classic"}];
-const grid=document.getElementById("products");
-function render(f="all"){grid.innerHTML="";products.filter(p=>f==="all"||p.cat===f).forEach(p=>{let m=encodeURIComponent(`Hi Stride Vault, I'd like to order the ${p.name} for GH₵${p.price}. My preferred size is: `);grid.innerHTML+=`<article class="card"><div class="photo"><span class="badge">${p.tag}</span><img src="${p.img}" alt="${p.name}" loading="lazy"></div><div class="body"><div class="row"><h3>${p.name}</h3><div class="price">GH₵${p.price}</div></div><div class="meta">Premium style • Ask for available sizes</div><a class="order" href="https://wa.me/233206194977?text=${m}" target="_blank">Order this pair ↗</a></div></article>`})}
+const sizes=[39,40,41,42,43,44,45],grid=document.getElementById("products");
+let cart=JSON.parse(localStorage.getItem("strideVaultCart")||"[]");
+
+function render(f="all"){
+grid.innerHTML="";
+products.filter(p=>f==="all"||p.cat===f).forEach((p,i)=>{
+grid.innerHTML+=`<article class="card"><div class="photo"><span class="badge">${p.tag}</span><img src="${p.img}" alt="${p.name}" loading="lazy"></div><div class="body"><div class="row"><h3>${p.name}</h3><div class="price">GH₵${p.price}</div></div><div class="meta">Available sizes 39–45</div><select id="size-${i}">${sizes.map(s=>`<option value="${s}">Size ${s}</option>`).join("")}</select><button class="add" onclick="addToCart(${i},'${f}')">Add to Cart</button></div></article>`});
+}
+function currentProducts(f="all"){return products.filter(p=>f==="all"||p.cat===f)}
+function addToCart(i,f){
+const p=currentProducts(f)[i],size=document.getElementById(`size-${i}`).value;
+const existing=cart.find(x=>x.name===p.name&&x.size==size);
+if(existing) existing.qty++; else cart.push({name:p.name,price:p.price,img:p.img,size,qty:1});
+save();openCart();
+}
+function save(){localStorage.setItem("strideVaultCart",JSON.stringify(cart));updateCart()}
+function updateCart(){
+document.getElementById("count").textContent=cart.reduce((a,x)=>a+x.qty,0);
+const box=document.getElementById("cartitems");
+if(!cart.length){box.innerHTML='<div class="empty">Your cart is empty.<br>Add a pair to get started.</div>';document.getElementById("total").textContent="GH₵0";return}
+let total=0;box.innerHTML="";
+cart.forEach((x,i)=>{total+=x.price*x.qty;box.innerHTML+=`<div class="cartitem"><img src="${x.img}" alt=""><div><b>${x.name}</b><small>Size ${x.size} • Qty ${x.qty}</small><small>GH₵${x.price*x.qty}</small></div><button class="remove" onclick="removeItem(${i})">Remove</button></div>`});
+document.getElementById("total").textContent=`GH₵${total}`;
+}
+function removeItem(i){cart.splice(i,1);save()}
+function openCart(){document.getElementById("drawer").classList.add("open");updateCart()}
+function closeCart(){document.getElementById("drawer").classList.remove("open")}
+function checkout(){
+if(!cart.length){alert("Your cart is empty.");return}
+let total=cart.reduce((a,x)=>a+x.price*x.qty,0);
+let lines=cart.map(x=>`• ${x.name} — Size ${x.size} — Qty ${x.qty} — GH₵${x.price*x.qty}`).join("\\n");
+let msg=`Hi Stride Vault, I'd like to place this order:\\n\\n${lines}\\n\\nTotal: GH₵${total}\\n\\nPlease confirm availability and delivery details.`;
+window.open("https://wa.me/233206194977?text="+encodeURIComponent(msg),"_blank");
+}
 document.querySelectorAll(".filter").forEach(b=>b.onclick=()=>{document.querySelectorAll(".filter").forEach(x=>x.classList.remove("active"));b.classList.add("active");render(b.dataset.f)});
-document.getElementById("year").textContent=new Date().getFullYear();render();
-</script></body></html>
+document.getElementById("year").textContent=new Date().getFullYear();
+render();updateCart();
+</script>
+</body></html>
