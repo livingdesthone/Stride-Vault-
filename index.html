@@ -79,10 +79,12 @@ footer{border-top:1px solid var(--line);padding:28px 0;color:#777}.foot{display:
 <div class="drawer" id="drawer"><div class="shade" onclick="closeCart()"></div><aside class="cart">
 <div class="carthead"><h2>Your Cart</h2><button class="close" onclick="closeCart()">×</button></div>
 <div class="cartitems" id="cartitems"></div><div class="total"><span>Total</span><span id="total">GH₵0</span></div>
-<button class="checkout" onclick="checkout()">Checkout on WhatsApp</button>
+<button class="checkout" onclick="payWithPaystack()">Pay with Paystack</button><button class="checkout" style="margin-top:10px;background:#fff" onclick="checkout()">Order via WhatsApp</button>
 </aside></div>
 
+<script src="https://js.paystack.co/v2/inline.js"></script>
 <script>
+const PAYSTACK_PUBLIC_KEY="pk_live_3b74ceeaa0c4c2cfdecf238b77cf5ab3d403224c";
 const products=[
 {name:"RC 1300",price:380,img:"sneaker-1.jpg",cat:"classic",tag:"Featured"},
 {name:"Air Max",price:420,img:"sneaker-2.jpg",cat:"sport",tag:"Popular"},
@@ -123,7 +125,57 @@ let lines=cart.map(x=>`• ${x.name} — Size ${x.size} — Qty ${x.qty} — GH�
 let msg=`Hi Stride Vault, I'd like to place this order:\\n\\n${lines}\\n\\nTotal: GH₵${total}\\n\\nPlease confirm availability and delivery details.`;
 window.open("https://wa.me/233206194977?text="+encodeURIComponent(msg),"_blank");
 }
-document.querySelectorAll(".filter").forEach(b=>b.onclick=()=>{document.querySelectorAll(".filter").forEach(x=>x.classList.remove("active"));b.classList.add("active");render(b.dataset.f)});
+function payWithPaystack(){
+ if(!cart.length){alert("Your cart is empty.");return}
+ const total=cart.reduce((s,x)=>s+x.price*x.qty,0);
+ const email=prompt("Enter your email address for your Paystack receipt:");
+ if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){alert("Please enter a valid email address.");return}
+ const popup=new PaystackPop();
+ popup.newTransaction({
+  key:PAYSTACK_PUBLIC_KEY,
+  email:email,
+  amount:Math.round(total*100),
+  currency:"GHS",
+  reference:"SV-"+Date.now(),
+  metadata:{custom_fields:[
+   {display_name:"Store",variable_name:"store",value:"Stride Vault"},
+   {display_name:"Items",variable_name:"items",value:cart.map(x=>`${x.name} | Size ${x.size} | Qty ${x.qty}`).join("; ")}
+  ]},
+  onSuccess:(transaction)=>{
+   const lines=cart.map(x=>`• ${x.name} — Size ${x.size} — Qty ${x.qty} — GH₵${x.price*x.qty}`).join("\n");
+   const msg=`Hi Stride Vault, I completed a Paystack payment.\n\n${lines}\n\nTotal: GH₵${total}\nPaystack reference: ${transaction.reference}\n\nPlease confirm my order and delivery details.`;
+   window.open("https://wa.me/233206194977?text="+encodeURIComponent(msg),"_blank");
+  },
+  onCancel:()=>alert("Payment was cancelled. Your cart is still saved."),
+  onError:(error)=>alert("Paystack could not start the payment: "+(error?.message||"Please try again."))
+ });
+}
+document.querySelectorAll(".filter").forEach(b=>b.onclick=()=>{function payWithPaystack(){
+ if(!cart.length){alert("Your cart is empty.");return}
+ const total=cart.reduce((s,x)=>s+x.price*x.qty,0);
+ const email=prompt("Enter your email address for your Paystack receipt:");
+ if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){alert("Please enter a valid email address.");return}
+ const popup=new PaystackPop();
+ popup.newTransaction({
+  key:PAYSTACK_PUBLIC_KEY,
+  email:email,
+  amount:Math.round(total*100),
+  currency:"GHS",
+  reference:"SV-"+Date.now(),
+  metadata:{custom_fields:[
+   {display_name:"Store",variable_name:"store",value:"Stride Vault"},
+   {display_name:"Items",variable_name:"items",value:cart.map(x=>`${x.name} | Size ${x.size} | Qty ${x.qty}`).join("; ")}
+  ]},
+  onSuccess:(transaction)=>{
+   const lines=cart.map(x=>`• ${x.name} — Size ${x.size} — Qty ${x.qty} — GH₵${x.price*x.qty}`).join("\n");
+   const msg=`Hi Stride Vault, I completed a Paystack payment.\n\n${lines}\n\nTotal: GH₵${total}\nPaystack reference: ${transaction.reference}\n\nPlease confirm my order and delivery details.`;
+   window.open("https://wa.me/233206194977?text="+encodeURIComponent(msg),"_blank");
+  },
+  onCancel:()=>alert("Payment was cancelled. Your cart is still saved."),
+  onError:(error)=>alert("Paystack could not start the payment: "+(error?.message||"Please try again."))
+ });
+}
+document.querySelectorAll(".filter").forEach(x=>x.classList.remove("active"));b.classList.add("active");render(b.dataset.f)});
 document.getElementById("year").textContent=new Date().getFullYear();
 render();updateCart();
 </script>
