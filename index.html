@@ -147,6 +147,20 @@ function payWithPaystack(){
     if(result.currency!=="GHS" || paid < total){alert("Verified payment does not match the order total. Contact Stride Vault.");return}
     const lines=cart.map(x=>`• ${x.name} — Size ${x.size} — Qty ${x.qty} — GH₵${x.price*x.qty}`).join("\n");
     const msg=`Hi Stride Vault, my payment has been VERIFIED by Paystack.\n\nCustomer: ${delivery.name}\nPhone: ${delivery.phone}\nDelivery location: ${delivery.location}\nLandmark: ${delivery.landmark || "N/A"}\n\n${lines}\n\nTotal: GH₵${total}\nPaystack reference: ${result.reference}\n\nPlease confirm my order and delivery details.`;
+          const saveOrder = await fetch("/api/create-order", {
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({
+              reference:result.reference,
+              customer:delivery,
+              items:cart.map(x=>({name:x.name,size:x.size,qty:x.qty,price:x.price}))
+            })
+          });
+          if(!saveOrder.ok){
+            alert("Payment was verified, but the order could not be saved to the dashboard. Keep reference: "+result.reference);
+            return;
+          }
+
     window.open("https://wa.me/233206194977?text="+encodeURIComponent(msg),"_blank");
     cart=[];save();
     alert("Payment verified successfully. Your order is ready in WhatsApp.");
