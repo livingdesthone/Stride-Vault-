@@ -1,7 +1,3 @@
-# Stride Vault — PRO + Cart + Paystack
+Stride Vault — verified Paystack checkout.
 
-Includes sizes 39–45, shopping cart, Paystack GHS checkout, and WhatsApp order confirmation.
-
-The Paystack public key is used in the frontend. Never add a Paystack secret key to this repository.
-
-IMPORTANT: For real-money production use, payment status and amount should be verified server-side or with a secure Paystack webhook before releasing goods.
+The frontend uses the Paystack public key only. The Paystack secret key remains in Vercel as PAYSTACK_SECRET_KEY. After checkout, the site calls https://stride-vault.vercel.app/api/verify-payment and checks success, GHS currency, and the paid amount before WhatsApp confirmation. Never put the Paystack secret key in GitHub or chat.

@@ -85,6 +85,7 @@ footer{border-top:1px solid var(--line);padding:28px 0;color:#777}.foot{display:
 <script src="https://js.paystack.co/v2/inline.js"></script>
 <script>
 const PAYSTACK_PUBLIC_KEY="pk_live_3b74ceeaa0c4c2cfdecf238b77cf5ab3d403224c";
+const VERIFY_URL="https://stride-vault.vercel.app/api/verify-payment";
 const products=[
 {name:"RC 1300",price:380,img:"sneaker-1.jpg",cat:"classic",tag:"Featured"},
 {name:"Air Max",price:420,img:"sneaker-2.jpg",cat:"sport",tag:"Popular"},
@@ -132,50 +133,30 @@ function payWithPaystack(){
  if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){alert("Please enter a valid email address.");return}
  const popup=new PaystackPop();
  popup.newTransaction({
-  key:PAYSTACK_PUBLIC_KEY,
-  email:email,
-  amount:Math.round(total*100),
-  currency:"GHS",
-  reference:"SV-"+Date.now(),
+  key:PAYSTACK_PUBLIC_KEY,email:email,amount:Math.round(total*100),currency:"GHS",reference:"SV-"+Date.now(),
   metadata:{custom_fields:[
    {display_name:"Store",variable_name:"store",value:"Stride Vault"},
    {display_name:"Items",variable_name:"items",value:cart.map(x=>`${x.name} | Size ${x.size} | Qty ${x.qty}`).join("; ")}
   ]},
-  onSuccess:(transaction)=>{
-   const lines=cart.map(x=>`• ${x.name} — Size ${x.size} — Qty ${x.qty} — GH₵${x.price*x.qty}`).join("\n");
-   const msg=`Hi Stride Vault, I completed a Paystack payment.\n\n${lines}\n\nTotal: GH₵${total}\nPaystack reference: ${transaction.reference}\n\nPlease confirm my order and delivery details.`;
-   window.open("https://wa.me/233206194977?text="+encodeURIComponent(msg),"_blank");
+  onSuccess:async(transaction)=>{
+   try{
+    const r=await fetch(VERIFY_URL+"?reference="+encodeURIComponent(transaction.reference));
+    const result=await r.json();
+    if(!r.ok || !result.verified || result.status!=="success"){alert("Payment could not be verified. Keep this reference: "+transaction.reference);return}
+    const paid=Number(result.amount)/100;
+    if(result.currency!=="GHS" || paid < total){alert("Verified payment does not match the order total. Contact Stride Vault.");return}
+    const lines=cart.map(x=>`• ${x.name} — Size ${x.size} — Qty ${x.qty} — GH₵${x.price*x.qty}`).join("\n");
+    const msg=`Hi Stride Vault, my payment has been VERIFIED by Paystack.\n\n${lines}\n\nTotal: GH₵${total}\nPaystack reference: ${result.reference}\n\nPlease confirm my order and delivery details.`;
+    window.open("https://wa.me/233206194977?text="+encodeURIComponent(msg),"_blank");
+    cart=[];save();
+    alert("Payment verified successfully. Your order is ready in WhatsApp.");
+   }catch(e){alert("Payment succeeded but verification could not be completed. Reference: "+transaction.reference)}
   },
   onCancel:()=>alert("Payment was cancelled. Your cart is still saved."),
-  onError:(error)=>alert("Paystack could not start the payment: "+(error?.message||"Please try again."))
+  onError:(error)=>alert("Paystack error: "+(error?.message||"Please try again."))
  });
 }
-document.querySelectorAll(".filter").forEach(b=>b.onclick=()=>{function payWithPaystack(){
- if(!cart.length){alert("Your cart is empty.");return}
- const total=cart.reduce((s,x)=>s+x.price*x.qty,0);
- const email=prompt("Enter your email address for your Paystack receipt:");
- if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){alert("Please enter a valid email address.");return}
- const popup=new PaystackPop();
- popup.newTransaction({
-  key:PAYSTACK_PUBLIC_KEY,
-  email:email,
-  amount:Math.round(total*100),
-  currency:"GHS",
-  reference:"SV-"+Date.now(),
-  metadata:{custom_fields:[
-   {display_name:"Store",variable_name:"store",value:"Stride Vault"},
-   {display_name:"Items",variable_name:"items",value:cart.map(x=>`${x.name} | Size ${x.size} | Qty ${x.qty}`).join("; ")}
-  ]},
-  onSuccess:(transaction)=>{
-   const lines=cart.map(x=>`• ${x.name} — Size ${x.size} — Qty ${x.qty} — GH₵${x.price*x.qty}`).join("\n");
-   const msg=`Hi Stride Vault, I completed a Paystack payment.\n\n${lines}\n\nTotal: GH₵${total}\nPaystack reference: ${transaction.reference}\n\nPlease confirm my order and delivery details.`;
-   window.open("https://wa.me/233206194977?text="+encodeURIComponent(msg),"_blank");
-  },
-  onCancel:()=>alert("Payment was cancelled. Your cart is still saved."),
-  onError:(error)=>alert("Paystack could not start the payment: "+(error?.message||"Please try again."))
- });
-}
-document.querySelectorAll(".filter").forEach(x=>x.classList.remove("active"));b.classList.add("active");render(b.dataset.f)});
+document.querySelectorAll(".filter").forEach(b=>b.onclick=()=>{document.querySelectorAll(".filter").forEach(x=>x.classList.remove("active"));b.classList.add("active");render(b.dataset.f)});
 document.getElementById("year").textContent=new Date().getFullYear();
 render();updateCart();
 </script>
