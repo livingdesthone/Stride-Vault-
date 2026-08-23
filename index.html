@@ -126,8 +126,20 @@ let lines=cart.map(x=>`• ${x.name} — Size ${x.size} — Qty ${x.qty} — GH�
 let msg=`Hi Stride Vault, I'd like to place this order:\\n\\n${lines}\\n\\nTotal: GH₵${total}\\n\\nPlease confirm availability and delivery details.`;
 window.open("https://wa.me/233206194977?text="+encodeURIComponent(msg),"_blank");
 }
+function getDeliveryDetails(){
+ const name=prompt("Customer name:");
+ if(!name) return null;
+ const phone=prompt("Customer phone number:");
+ if(!phone) return null;
+ const location=prompt("Delivery location / area:");
+ if(!location) return null;
+ const landmark=prompt("Nearest landmark (optional):")||"";
+ return {name,phone,location,landmark};
+}
 function payWithPaystack(){
  if(!cart.length){alert("Your cart is empty.");return}
+ const delivery=getDeliveryDetails();
+ if(!delivery){alert("Order cancelled. Please enter the required delivery details.");return}
  const total=cart.reduce((s,x)=>s+x.price*x.qty,0);
  const email=prompt("Enter your email address for your Paystack receipt:");
  if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){alert("Please enter a valid email address.");return}

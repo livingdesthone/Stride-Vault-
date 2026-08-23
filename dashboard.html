@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stride Vault — Order Dashboard</title>
+<style>
+body{margin:0;background:#08090a;color:#f5f5f2;font-family:Arial,sans-serif}
+.wrap{width:min(1100px,94%);margin:24px auto}.top{display:flex;justify-content:space-between;gap:12px;align-items:center}
+h1{font-size:28px}.muted{color:#999}.card{background:#111314;border:1px solid #292b2d;border-radius:16px;padding:16px;margin:14px 0}
+input,button,select{border:1px solid #333;background:#17191a;color:#fff;border-radius:10px;padding:12px}
+button{cursor:pointer}.primary{background:#d7ff45;color:#08090a;border:0;font-weight:800}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.stat b{font-size:24px}
+table{width:100%;border-collapse:collapse}.scroll{overflow:auto}th,td{padding:12px 8px;border-bottom:1px solid #292b2d;text-align:left;vertical-align:top}
+.badge{display:inline-block;padding:5px 8px;border-radius:999px;background:#222}.login{max-width:420px;margin:15vh auto}
+@media(max-width:700px){.grid{grid-template-columns:repeat(2,1fr)}th:nth-child(4),td:nth-child(4){display:none}}
+</style>
+</head>
+<body>
+<div id="login" class="login card">
+  <h1>Stride Vault</h1><p class="muted">Private Order Dashboard</p>
+  <input id="password" type="password" placeholder="Admin password" style="width:100%;box-sizing:border-box">
+  <button class="primary" style="width:100%;margin-top:10px" onclick="login()">Open Dashboard</button>
+  <p id="loginMsg" class="muted"></p>
+</div>
+
+<div id="app" class="wrap" style="display:none">
+  <div class="top"><div><h1>Order Dashboard</h1><p class="muted">Stride Vault</p></div>
+  <button onclick="loadOrders()">Refresh</button></div>
+
+  <div class="grid">
+    <div class="card stat"><span class="muted">Orders</span><br><b id="count">0</b></div>
+    <div class="card stat"><span class="muted">Paid</span><br><b id="paid">0</b></div>
+    <div class="card stat"><span class="muted">Delivered</span><br><b id="delivered">0</b></div>
+    <div class="card stat"><span class="muted">Sales</span><br><b id="sales">GH₵0</b></div>
+  </div>
+
+  <div class="card">
+    <div class="scroll">
+      <table><thead><tr><th>Customer</th><th>Order</th><th>Total</th><th>Delivery</th><th>Status</th></tr></thead>
+      <tbody id="orders"><tr><td colspan="5">Loading…</td></tr></tbody></table>
+    </div>
+  </div>
+</div>
+
+<script>
+async function login(){
+  const password=document.getElementById("password").value;
+  const r=await fetch("/api/admin-login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password})});
+  if(!r.ok){document.getElementById("loginMsg").textContent="Wrong password.";return}
+  document.getElementById("login").style.display="none";
+  document.getElementById("app").style.display="block";
+  loadOrders();
+}
+async function loadOrders(){
+  const r=await fetch("/api/orders");
+  if(r.status===401){document.getElementById("login").style.display="block";document.getElementById("app").style.display="none";return}
+  const data=await r.json();
+  if(!Array.isArray(data)){alert("Could not load orders.");return}
+  render(data);
+}
+function render(data){
+  document.getElementById("count").textContent=data.length;
+  document.getElementById("paid").textContent=data.filter(x=>x.status==="Paid").length;
+  document.getElementById("delivered").textContent=data.filter(x=>x.status==="Delivered").length;
+  document.getElementById("sales").textContent="GH₵"+data.reduce((s,x)=>s+Number(x.total_amount||0),0).toFixed(2);
+
+  const body=document.getElementById("orders");
+  body.innerHTML=data.map(o=>{
+    const items=(o.items||[]).map(x=>`${x.name} — ${x.size} × ${x.qty}`).join("<br>");
+    const status=["Paid","Processing","Delivered","Cancelled"].map(v=>`<option ${v===o.status?"selected":""}>${v}</option>`).join("");
+    return `<tr>
+      <td><b>${esc(o.customer_name)}</b><br>${esc(o.customer_phone)}</td>
+      <td><small>${esc(o.reference)}</small><br>${items}</td>
+      <td><b>GH₵${Number(o.total_amount).toFixed(2)}</b></td>
+      <td>${esc(o.delivery_location)}<br><span class="muted">${esc(o.landmark||"")}</span></td>
+      <td><select onchange="updateStatus('${o.id}',this.value)">${status}</select></td>
+    </tr>`;
+  }).join("") || '<tr><td colspan="5">No orders yet.</td></tr>';
+}
+async function updateStatus(id,status){
+  const r=await fetch("/api/orders",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({id,status})});
+  if(!r.ok){alert("Could not update status.");loadOrders();}
+}
+function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+</script>
+</body>
+</html>
