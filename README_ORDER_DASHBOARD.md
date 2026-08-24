@@ -1,31 +1,50 @@
-# Stride Vault Order Dashboard
+# Stride Vault — Order Dashboard Fix
 
-This upgrade adds a private dashboard at:
+## What was fixed
 
-https://stride-vault.vercel.app/dashboard.html
+The previous build had `dashboard.html` calling `/api/orders`, but `api/orders.js` was missing. It also referenced `/api/create-order` and `/api/verify-payment`, which were missing from the ZIP.
 
-It stores verified paid orders in Supabase and lets you change status:
-Paid → Processing → Delivered / Cancelled.
+This build includes all three routes:
 
-## One-time setup
+- `/api/orders` — protected dashboard GET/PATCH endpoint
+- `/api/verify-payment` — server-side Paystack verification
+- `/api/create-order` — verifies the payment again and saves the order to Supabase
 
-### A. Create the Supabase table
-Open Supabase SQL Editor and run `supabase_schema.sql`.
+Dashboard URL:
 
-### B. Add Vercel environment variables
-In Vercel → Project → Settings → Environment Variables add:
+`https://stride-vault.vercel.app/dashboard.html`
 
-SUPABASE_URL = your Supabase project URL
-SUPABASE_SERVICE_ROLE_KEY = your Supabase service-role key
-ADMIN_PASSWORD = a strong private dashboard password
-ADMIN_SESSION_SECRET = a long random secret (32+ characters)
+## Supabase
 
-Keep SUPABASE_SERVICE_ROLE_KEY and the two admin secrets private. Never put them in GitHub or the website.
+Run `supabase_schema.sql` in the Supabase SQL Editor.
 
-### C. Redeploy
-Push/commit the included files to the same GitHub repository so Vercel deploys them.
+## Vercel environment variables
 
-### D. Use the dashboard
-Open /dashboard.html, enter ADMIN_PASSWORD, and you will see verified orders.
+Add these in Vercel → Project → Settings → Environment Variables:
 
-The payment flow saves an order only after the Vercel API verifies the Paystack transaction with PAYSTACK_SECRET_KEY.
+- `PAYSTACK_SECRET_KEY`
+- `SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `ADMIN_PASSWORD`
+- `ADMIN_SESSION_SECRET`
+
+Use the same production values for the Production environment.
+
+Never put `PAYSTACK_SECRET_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `ADMIN_PASSWORD`, or `ADMIN_SESSION_SECRET` inside `index.html` or GitHub.
+
+## Deploy
+
+Upload/commit the contents of this ZIP to the GitHub repository connected to Vercel, then redeploy.
+
+After deployment:
+
+1. Open `/dashboard.html`.
+2. Enter the value from `ADMIN_PASSWORD`.
+3. The dashboard should load the orders from Supabase.
+4. Test a small real Paystack payment only after confirming the environment variables are present.
+
+## Expected flow
+
+Cart → delivery details → Paystack → `/api/verify-payment` → `/api/create-order` → Supabase → `/dashboard.html` → `/api/orders`.
+
+The server verifies the Paystack transaction again before saving, so a browser cannot simply mark an unpaid order as Paid.
