@@ -2,8 +2,13 @@ import { isAdmin } from "./_auth.js";
 import { supabaseRequest } from "./_supabase.js";
 
 export default async function handler(req, res) {
+  console.log("ORDERS API CALLED:", req.method);
+
   try {
-    if (!isAdmin(req)) {
+    const admin = isAdmin(req);
+    console.log("IS ADMIN:", admin);
+
+    if (!admin) {
       return res.status(401).json({
         ok: false,
         error: "Unauthorized"
@@ -11,21 +16,24 @@ export default async function handler(req, res) {
     }
 
     if (req.method === "GET") {
+      console.log("GETTING ORDERS FROM SUPABASE...");
+
       const rows = await supabaseRequest(
         "orders?select=*&order=created_at.desc"
       );
 
-      return res.status(200).json({
-        ok: true,
-        orders: Array.isArray(rows) ? rows : []
-      });
+      console.log("SUPABASE RETURNED:", rows);
+
+      return res.status(200).json(
+        Array.isArray(rows) ? rows : []
+      );
     }
 
     if (req.method === "PATCH") {
       const body =
         typeof req.body === "string"
           ? JSON.parse(req.body || "{}")
-          : req.body || {};
+          : (req.body || {});
 
       const id = String(body.id || "");
       const status = String(body.status || "");
@@ -39,7 +47,6 @@ export default async function handler(req, res) {
 
       if (!id || !allowed.has(status)) {
         return res.status(400).json({
-          ok: false,
           error: "Invalid order id or status."
         });
       }
@@ -55,14 +62,12 @@ export default async function handler(req, res) {
         }
       );
 
-      return res.status(200).json({
-        ok: true,
-        order: Array.isArray(rows) ? rows[0] || null : rows
-      });
+      return res.status(200).json(
+        Array.isArray(rows) ? rows[0] || null : rows
+      );
     }
 
     return res.status(405).json({
-      ok: false,
       error: "Method not allowed"
     });
 
@@ -71,7 +76,8 @@ export default async function handler(req, res) {
 
     return res.status(500).json({
       ok: false,
-      error: e.message || "Could not load orders."
+      error: e.message || "Could not load orders.",
+      stack: e.stack
     });
   }
-}
+                  }
